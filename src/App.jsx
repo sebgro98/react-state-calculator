@@ -3,53 +3,99 @@ import { useState } from 'react';
 
 function App() {
 
+  const [storedValue, setStoreValue] = useState(0);
+
   const [calculatorState, setCalculatorState] = useState({
     panel1: 0,
     panel2: 0,
-    answer: 0,
+    operation: "",
+    result: 0,
   });
 
-  const updatePanel1 = (amount = 0) => { // sets amount to 0 if undefined or null is being passed
+const storeValue = (value) => {
+    setStoreValue(value);
+}
+
+const retriveStoredValuePanel1 = () => {
+  setCalculatorState((prevState) => ({
+    ...prevState,
+    panel1: storedValue
+
+  }))
+}
+
+  const retriveStoredValuePanel2 = () => {
     setCalculatorState((prevState) => ({
       ...prevState,
-      panel1: amount,
-    }));
+      panel2: storedValue
+  
+    }))
+
+} 
+
+  const updatePanel1 = (amount) => {
+    if(amount === undefined) {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        panel1: 0
+      }));
+    } else {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        panel1: Number(`${prevState.panel1}${amount}`)
+      }));
+    }  
   };
 
-  const updatePanel2 = (amount = 0) => {
-    setCalculatorState((prevState) => ({
-      ...prevState,
-      panel2: amount,
-    }));
+  const updatePanel2 = (amount) => {
+    if(amount === undefined) {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        panel2: 0
+      }));
+    } else {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        panel2: Number(`${prevState.panel2}${amount}`)
+      }));
+    }  
   };
+  
   const calculateAnswer = (operation) => {
-    const { panel1, panel2 } = calculatorState;
-    let result = 0;
-
-    switch (operation) {
-      case "+":
-        result = panel1 + panel2;
-        break;
-      case "-":
-        result = panel1 - panel2;
-        break;
-      case "*":
-        result = panel1 * panel2;
-        break;
-      case "/":
-        result = panel1 / panel2;
-        break;
-      default:
-        break;
-    }
     setCalculatorState((prevState) => ({
       ...prevState,
-      answer: result,
-    }));
+      operation: operation
+    })) 
   };
 
-// Destructure calculatorState to use in the JSX
-const { panel1, panel2, answer } = calculatorState;
+  const getAnswer = () => {
+    const { operation, panel1, panel2 } = calculatorState;
+    console.log(operation);
+  
+    if (operation === "+") {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        result: panel1 + panel2,
+      }));
+    } else if (operation === "-") {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        result: panel1 - panel2,
+      }));
+    } else if (operation === "*") {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        result: panel1 * panel2,
+      }));
+    } else if (operation === "/") {
+      setCalculatorState((prevState) => ({
+        ...prevState,
+        result: panel1 / panel2,
+      }));
+    }
+  };
+
+const { panel1, panel2, result } = calculatorState;
 
   return (
     <div className="calculator">
@@ -67,6 +113,7 @@ const { panel1, panel2, answer } = calculatorState;
           <button onClick={() => updatePanel1(9)}>9</button>
           <button onClick={() => updatePanel1(0)}>0</button>
           <button onClick={() => updatePanel1()}> Clear </button>
+          <button onClick={() => retriveStoredValuePanel1()}> recall </button>
         </div>
       </div>
 
@@ -94,12 +141,14 @@ const { panel1, panel2, answer } = calculatorState;
           <button onClick={() => updatePanel2(9)}>9</button>
           <button onClick={() => updatePanel2(0)}>0</button>
           <button onClick={() => updatePanel2()} >Clear</button>
+          <button onClick={() => retriveStoredValuePanel2()}> recall </button>
         </div>
       </div>
       <div className="panel answer">
-        <p>{answer}</p>
+        <p>{result}</p>
         <div>
-          <button>=</button>
+          <button  onClick={() => getAnswer()} >=</button>
+          <button  onClick={() => storeValue(result)}> store value</button>
         </div>
       </div>
     </div>
